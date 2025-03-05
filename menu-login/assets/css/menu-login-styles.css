@@ -1,0 +1,80 @@
+/* ==========================================================================
+   MENU LOGIN PLUGIN - GLOBAL/FALLBACK STYLES
+   ========================================================================== */
+
+/* Basic .menu-login-wrapper so that if no user style overrides are applied, 
+   we have a default layout. */
+.menu-login-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Logged-out icon default fallback */
+.menu-login-icon.unlogged {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: #000000; /* fallback, overridden by dynamic if needed */
+  width: 40px;               /* fallback */
+  height: 40px;              /* fallback */
+  color: #ffffff;            /* fallback icon color */
+}
+
+/* Hover fallback for unlogged icon */
+.menu-login-link:hover .menu-login-icon.unlogged {
+  background-color: #222222;
+}
+
+/* Logged-in fallback (the letter or avatar container) */
+.menu-login-icon.loggedin-new {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+/* Popup overlay global rules */
+.menu-login-ajax-popup-gpt {
+  display: none; /* shown via JS */
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background-color: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+}
+
+/* Keyframes for the spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Buttons fallback */
+.menu-login-button {
+  background-color: #0073aa;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.menu-login-button:hover {
+  background-color: #006799;
+}
+
+.menu-login-cancel-button {
+  background-color: #cccccc;
+  color: #000;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.menu-login-cancel-button:hover {
+  background-color: #aaaaaa;
+}
+
+/* e.g. fallback for error messages, etc. */
