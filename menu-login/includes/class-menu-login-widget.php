@@ -16,22 +16,37 @@ if ( did_action( 'elementor/loaded' ) ) {
 
 	class Menu_Login_Widget extends \Elementor\Widget_Base {
 
+		/**
+		 * Get widget name.
+		 */
 		public function get_name() {
 			return 'menu_login_icon';
 		}
 
+		/**
+		 * Get widget title.
+		 */
 		public function get_title() {
 			return __( 'Menu Login Icon', 'menu-login' );
 		}
 
+		/**
+		 * Get widget icon.
+		 */
 		public function get_icon() {
 			return 'eicon-lock-user';
 		}
 
+		/**
+		 * Get widget categories.
+		 */
 		public function get_categories() {
 			return [ 'general' ];
 		}
 
+		/**
+		 * Get widget keywords.
+		 */
 		public function get_keywords() {
 			return [ 'login', 'icon', 'ajax', 'popup', 'woo', 'woocommerce', 'account', 'user', 'svg' ];
 		}
@@ -64,10 +79,12 @@ if ( did_action( 'elementor/loaded' ) ) {
 		 */
 		protected function get_elementor_breakpoints() {
 			$breakpoints = \Elementor\Plugin::$instance->breakpoints->get_active_breakpoints();
-			return [
-				'tablet' => isset( $breakpoints['tablet'] ) ? $breakpoints['tablet']->get_value() : 1024,
-				'mobile' => isset( $breakpoints['mobile'] ) ? $breakpoints['mobile']->get_value() : 767,
-			];
+			$dynamic_breakpoints = [];
+			foreach ( $breakpoints as $break => $bp_obj ) {
+				// Make sure the breakpoint object exists before calling get_value()
+				$dynamic_breakpoints[ $break ] = isset( $bp_obj ) ? $bp_obj->get_value() : null;
+			}
+			return $dynamic_breakpoints;
 		}
 
 		/**
@@ -98,14 +115,12 @@ if ( did_action( 'elementor/loaded' ) ) {
 
 		/**
 		 * Register widget controls.
-		 *
-		 * All content and style controls are defined below.
 		 */
 		protected function register_controls() {
 
-			// -------------------------------------------
+			// ==========================================
 			// CONTENT TAB
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_icon_content',
 				[
@@ -113,7 +128,6 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
 				]
 			);
-
 			$this->add_control(
 				'icon',
 				[
@@ -125,7 +139,6 @@ if ( did_action( 'elementor/loaded' ) ) {
 					],
 				]
 			);
-
 			$this->add_control(
 				'welcome_message',
 				[
@@ -134,7 +147,6 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'default' => __( 'Welcome ', 'menu-login' ),
 				]
 			);
-
 			$this->add_control(
 				'enable_ajax',
 				[
@@ -147,7 +159,6 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'default' => 'yes',
 				]
 			);
-
 			$this->add_responsive_control(
 				'menu_message_layout',
 				[
@@ -161,7 +172,6 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'default' => 'row',
 				]
 			);
-
 			$this->add_control(
 				'login_title',
 				[
@@ -170,7 +180,6 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'default' => __( 'Login', 'menu-login' ),
 				]
 			);
-
 			$this->add_control(
 				'pre_show_popup_button',
 				[
@@ -180,12 +189,11 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 				]
 			);
-
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Login Container
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_icon_style',
 				[
@@ -193,7 +201,6 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
 				]
 			);
-
 			$this->add_responsive_control(
 				'menu_login_margin',
 				[
@@ -201,22 +208,23 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'size_units' => [ 'px', 'em', '%' ],
 					'default'    => [
-						'top'    => '0',
-						'right'  => '0',
-						'bottom' => '0',
-						'left'   => '0',
-						'unit'   => 'px',
+						'top'      => '0',
+						'right'    => '0',
+						'bottom'   => '0',
+						'left'     => '0',
+						'unit'     => 'px',
 						'isLinked' => false,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-wrapper' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
-
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Logged Out Style
-			// (Include all controls for normal and hover states)
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_logged_out_icon_style',
 				[
@@ -227,22 +235,28 @@ if ( did_action( 'elementor/loaded' ) ) {
 
 			$this->start_controls_tabs( 'logged_out_icon_tabs' );
 
-			// Normal
+			// Normal State
 			$this->start_controls_tab( 'logged_out_icon_normal', [ 'label' => __( 'Normal', 'menu-login' ) ] );
 			$this->add_control(
 				'logged_out_icon_color',
 				[
-					'label'   => __( 'Icon Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Icon Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.unlogged .menu-login-svg-icon' => 'fill: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_out_icon_background_color',
 				[
-					'label'   => __( 'Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#000000',
+					'label'     => __( 'Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#000000',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.unlogged' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
@@ -256,7 +270,10 @@ if ( did_action( 'elementor/loaded' ) ) {
 						'em' => [ 'min' => 0.5, 'max' => 15 ],
 						'%'  => [ 'min' => 5, 'max' => 100 ],
 					],
-					'default' => [ 'unit' => 'px', 'size' => 40 ],
+					'default'   => [ 'unit' => 'px', 'size' => 40 ],
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.unlogged' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
@@ -266,12 +283,15 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'size_units' => [ 'px', 'em', '%' ],
 					'default'    => [
-						'top'    => '0',
-						'right'  => '0',
-						'bottom' => '0',
-						'left'   => '0',
-						'unit'   => 'px',
+						'top'      => '0',
+						'right'    => '0',
+						'bottom'   => '0',
+						'left'     => '0',
+						'unit'     => 'px',
 						'isLinked' => false,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-icon.unlogged' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
@@ -282,28 +302,34 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'size_units' => [ 'px', '%', 'em' ],
 					'default'    => [
-						'top'    => '0',
-						'right'  => '0',
-						'bottom' => '0',
-						'left'   => '0',
-						'unit'   => 'px',
+						'top'      => '0',
+						'right'    => '0',
+						'bottom'   => '0',
+						'left'     => '0',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-icon.unlogged' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->add_control(
 				'logged_out_icon_border_style',
 				[
-					'label'   => __( 'Border Style', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'options' => [
+					'label'     => __( 'Border Style', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::SELECT,
+					'options'   => [
 						'none'   => __( 'None', 'menu-login' ),
 						'solid'  => __( 'Solid', 'menu-login' ),
 						'dashed' => __( 'Dashed', 'menu-login' ),
 						'dotted' => __( 'Dotted', 'menu-login' ),
 						'double' => __( 'Double', 'menu-login' ),
 					],
-					'default' => 'none',
+					'default'   => 'none',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.unlogged' => 'border-style: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
@@ -313,41 +339,96 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'size_units' => [ 'px' ],
 					'default'    => [
-						'top'    => '0',
-						'right'  => '0',
-						'bottom' => '0',
-						'left'   => '0',
-						'unit'   => 'px',
+						'top'      => '0',
+						'right'    => '0',
+						'bottom'   => '0',
+						'left'     => '0',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-icon.unlogged' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->add_control(
 				'logged_out_icon_border_color',
 				[
-					'label'   => __( 'Border Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#000000',
+					'label'     => __( 'Border Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#000000',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.unlogged' => 'border-color: {{VALUE}};',
+					],
 				]
 			);
+			// Missing controls for Logged Out text:
+			// Logged Out Welcome Text Color & Typography
+			$this->add_control(
+				'logged_out_welcome_text_color',
+				[
+					'label'     => __( 'Logged Out Welcome Text Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} a .menu-login-icon.unlogged ~ .menu-login-messages .menu-login-welcome' => 'color: {{VALUE}};',
+					],
+				]
+			);
+			$this->add_group_control(
+				\Elementor\Group_Control_Typography::get_type(),
+				[
+					'name'     => 'logged_out_welcome_text_typography',
+					'label'    => __( 'Logged Out Welcome Text Typography', 'menu-login' ),
+					'selector' => '{{WRAPPER}} a .menu-login-icon.unlogged ~ .menu-login-messages .menu-login-welcome',
+				]
+			);
+
+			// --- Logged Out "Login" Text Color & Typography (Normal) --- 
+			$this->add_control(
+				'logged_out_login_text_color',
+				[
+					'label'     => __( 'Logged Out "Login" Text Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-message.menu-login-login-text' => 'color: {{VALUE}};',
+					],
+				]
+			);
+			$this->add_group_control(
+				\Elementor\Group_Control_Typography::get_type(),
+				[
+					'name'     => 'logged_out_login_text_typography',
+					'label'    => __( 'Logged Out "Login" Text Typography', 'menu-login' ),
+					'selector' => '{{WRAPPER}} .menu-login-message.menu-login-login-text',
+				]
+			);
+
 			$this->end_controls_tab();
 
-			// Hover
+			// Hover State
 			$this->start_controls_tab( 'logged_out_icon_hover', [ 'label' => __( 'Hover', 'menu-login' ) ] );
 			$this->add_control(
 				'logged_out_icon_hover_color',
 				[
-					'label'   => __( 'Icon Hover Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Icon Hover Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.unlogged .menu-login-svg-icon' => 'fill: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_out_icon_hover_background_color',
 				[
-					'label'   => __( 'Icon Hover Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#222222',
+					'label'     => __( 'Icon Hover Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#222222',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.unlogged' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
@@ -357,28 +438,34 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'size_units' => [ 'px', '%', 'em' ],
 					'default'    => [
-						'top'    => '0',
-						'right'  => '0',
-						'bottom' => '0',
-						'left'   => '0',
-						'unit'   => 'px',
+						'top'      => '0',
+						'right'    => '0',
+						'bottom'   => '0',
+						'left'     => '0',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.unlogged' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->add_control(
 				'logged_out_icon_hover_border_style',
 				[
-					'label'   => __( 'Border Style (Hover)', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'options' => [
+					'label'     => __( 'Border Style (Hover)', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::SELECT,
+					'options'   => [
 						'none'   => __( 'None', 'menu-login' ),
 						'solid'  => __( 'Solid', 'menu-login' ),
 						'dashed' => __( 'Dashed', 'menu-login' ),
 						'dotted' => __( 'Dotted', 'menu-login' ),
 						'double' => __( 'Double', 'menu-login' ),
 					],
-					'default' => 'none',
+					'default'   => 'none',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.unlogged' => 'border-style: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
@@ -388,30 +475,80 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'size_units' => [ 'px' ],
 					'default'    => [
-						'top'    => '0',
-						'right'  => '0',
-						'bottom' => '0',
-						'left'   => '0',
-						'unit'   => 'px',
+						'top'      => '0',
+						'right'    => '0',
+						'bottom'   => '0',
+						'left'     => '0',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.unlogged' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->add_control(
 				'logged_out_icon_hover_border_color',
 				[
-					'label'   => __( 'Border Color (Hover)', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#000000',
+					'label'     => __( 'Border Color (Hover)', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#000000',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.unlogged' => 'border-color: {{VALUE}};',
+					],
+				]
+			);
+			$this->add_control(
+				'logged_out_welcome_text_hover_color',
+				[
+					'label'     => __( 'Logged Out Welcome Text Hover Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					// Modified selector: hover style now applies when the entire link is hovered
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-messages .menu-login-welcome' => 'color: {{VALUE}};',
+					],
+				]
+			);
+			$this->add_group_control(
+				\Elementor\Group_Control_Typography::get_type(),
+				[
+					'name'     => 'logged_out_welcome_text_hover_typography',
+					'label'    => __( 'Logged Out Welcome Text Hover Typography', 'menu-login' ),
+					'selector' => '{{WRAPPER}} .menu-login-link:hover .menu-login-messages .menu-login-welcome',
+				]
+			);
+
+			// --- Logged Out "Login" Text (Hover) ---
+			$this->add_control(
+				'logged_out_login_text_hover_color',
+				[
+					'label'     => __( 'Logged Out "Login" Text Hover Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					// Modified selector: hover style now applies when the entire link is hovered
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-message.menu-login-login-text' => 'color: {{VALUE}};',
+					],
+				]
+			);
+			$this->add_group_control(
+				\Elementor\Group_Control_Typography::get_type(),
+				[
+					'name'     => 'logged_out_login_text_hover_typography',
+					'label'    => __( 'Logged Out "Login" Text Hover Typography', 'menu-login' ),
+					'selector' => '{{WRAPPER}} .menu-login-link:hover .menu-login-message.menu-login-login-text',
 				]
 			);
 			$this->end_controls_tab();
 			$this->end_controls_tabs();
+
+
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Logged In Letter Style
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_logged_in_letter_style',
 				[
@@ -425,17 +562,23 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'logged_in_letter_color',
 				[
-					'label'   => __( 'Letter Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Letter Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.loggedin-new' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_in_letter_background_color',
 				[
-					'label'   => __( 'Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#000000',
+					'label'     => __( 'Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#000000',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.loggedin-new' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -443,70 +586,92 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'logged_in_letter_typography_normal',
 					'label'    => __( 'Typography', 'menu-login' ),
-					'selector' => '.menu-login-wrapper-{{ID}} .menu-login-icon.loggedin-new',
+					'selector' => '{{WRAPPER}} .menu-login-icon.loggedin-new',
 				]
 			);
 			$this->add_responsive_control(
 				'logged_in_letter_padding',
 				[
-					'label' => __( 'Letter Padding', 'menu-login' ),
-					'type'  => \Elementor\Controls_Manager::DIMENSIONS,
+					'label'     => __( 'Letter Padding', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::DIMENSIONS,
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.loggedin-new' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_in_letter_border_radius',
 				[
-					'label' => __( 'Border Radius', 'menu-login' ),
-					'type'  => \Elementor\Controls_Manager::DIMENSIONS,
+					'label'     => __( 'Border Radius', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::DIMENSIONS,
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.loggedin-new' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_in_letter_border_style',
 				[
-					'label'   => __( 'Border Style', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'options' => [
+					'label'     => __( 'Border Style', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::SELECT,
+					'options'   => [
 						'none'   => __( 'None', 'menu-login' ),
 						'solid'  => __( 'Solid', 'menu-login' ),
 						'dashed' => __( 'Dashed', 'menu-login' ),
 						'dotted' => __( 'Dotted', 'menu-login' ),
 						'double' => __( 'Double', 'menu-login' ),
 					],
-					'default' => 'none',
+					'default'   => 'none',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.loggedin-new' => 'border-style: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_in_letter_border_width',
 				[
-					'label' => __( 'Border Width', 'menu-login' ),
-					'type'  => \Elementor\Controls_Manager::DIMENSIONS,
+					'label'     => __( 'Border Width', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::DIMENSIONS,
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.loggedin-new' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_in_letter_border_color',
 				[
-					'label'   => __( 'Border Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#000000',
+					'label'     => __( 'Border Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#000000',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-icon.loggedin-new' => 'border-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->end_controls_tab();
+
 			// Hover
 			$this->start_controls_tab( 'logged_in_letter_hover', [ 'label' => __( 'Hover', 'menu-login' ) ] );
 			$this->add_control(
 				'logged_in_letter_hover_color',
 				[
-					'label'   => __( 'Letter Hover Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Letter Color (Hover)', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.loggedin-new' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_in_letter_hover_background_color',
 				[
-					'label'   => __( 'Letter Hover Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#222222',
+					'label'     => __( 'Letter Background Color (Hover)', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#222222',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.loggedin-new' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -514,53 +679,75 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'logged_in_letter_typography_hover',
 					'label'    => __( 'Typography (Hover)', 'menu-login' ),
-					'selector' => '.menu-login-wrapper-{{ID}} .menu-login-icon.loggedin-new + .menu-login-messages .menu-login-welcome:hover',
+					'selector' => '{{WRAPPER}} .menu-login-link:hover .menu-login-icon.loggedin-new',
+				]
+			);
+			$this->add_responsive_control(
+				'logged_in_letter_hover_padding',
+				[
+					'label'     => __( 'Letter Padding (Hover)', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::DIMENSIONS,
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.loggedin-new' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_in_letter_hover_border_radius',
 				[
-					'label' => __( 'Border Radius (Hover)', 'menu-login' ),
-					'type'  => \Elementor\Controls_Manager::DIMENSIONS,
+					'label'     => __( 'Border Radius (Hover)', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::DIMENSIONS,
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.loggedin-new' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_in_letter_hover_border_style',
 				[
-					'label'   => __( 'Border Style (Hover)', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'options' => [
+					'label'     => __( 'Border Style (Hover)', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::SELECT,
+					'options'   => [
 						'none'   => __( 'None', 'menu-login' ),
 						'solid'  => __( 'Solid', 'menu-login' ),
 						'dashed' => __( 'Dashed', 'menu-login' ),
 						'dotted' => __( 'Dotted', 'menu-login' ),
 						'double' => __( 'Double', 'menu-login' ),
 					],
-					'default' => 'none',
+					'default'   => 'none',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.loggedin-new' => 'border-style: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_in_letter_hover_border_width',
 				[
-					'label' => __( 'Border Width (Hover)', 'menu-login' ),
-					'type'  => \Elementor\Controls_Manager::DIMENSIONS,
+					'label'     => __( 'Border Width (Hover)', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::DIMENSIONS,
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.loggedin-new' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					],
 				]
 			);
 			$this->add_control(
 				'logged_in_letter_hover_border_color',
 				[
-					'label'   => __( 'Border Color (Hover)', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#000000',
+					'label'     => __( 'Border Color (Hover)', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#000000',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.loggedin-new' => 'border-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->end_controls_tab();
 			$this->end_controls_tabs();
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Logged in Message Text
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_message_style',
 				[
@@ -574,11 +761,11 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'message_text_color',
 				[
-					'label'   => __( 'Text Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Text Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
 					'selectors' => [
-						'.menu-login-wrapper-{{ID}} .menu-login-icon.loggedin-new + .menu-login-messages .menu-login-welcome' => 'color: {{VALUE}};',
+						'{{WRAPPER}} .menu-login-icon.loggedin-new + .menu-login-messages .menu-login-welcome' => 'color: {{VALUE}};',
 					],
 				]
 			);
@@ -587,7 +774,7 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'message_text_typography_normal',
 					'label'    => __( 'Typography', 'menu-login' ),
-					'selector' => '.menu-login-wrapper-{{ID}} .menu-login-icon.loggedin-new + .menu-login-messages .menu-login-welcome',
+					'selector' => '{{WRAPPER}} .menu-login-icon.loggedin-new + .menu-login-messages .menu-login-welcome',
 				]
 			);
 			$this->end_controls_tab();
@@ -596,11 +783,11 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'message_text_hover_color',
 				[
-					'label'   => __( 'Text Hover Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Text Hover Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
 					'selectors' => [
-						'.menu-login-wrapper-{{ID}} .menu-login-icon.loggedin-new + .menu-login-messages .menu-login-welcome:hover' => 'color: {{VALUE}};',
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-icon.loggedin-new + .menu-login-messages .menu-login-welcome' => 'color: {{VALUE}} !important;',
 					],
 				]
 			);
@@ -609,16 +796,16 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'message_text_typography_hover',
 					'label'    => __( 'Typography (Hover)', 'menu-login' ),
-					'selector' => '.menu-login-wrapper-{{ID}} .menu-login-icon.loggedin-new + .menu-login-messages .menu-login-welcome:hover',
+					'selector' => '{{WRAPPER}} .menu-login-link:hover .menu-login-icon.loggedin-new + .menu-login-messages .menu-login-welcome',
 				]
 			);
 			$this->end_controls_tab();
 			$this->end_controls_tabs();
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Customer Name Style
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_customer_name_style',
 				[
@@ -632,9 +819,12 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'customer_name_color',
 				[
-					'label'   => __( 'Name Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Name Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-user-name' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -642,7 +832,7 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'customer_name_typography_normal',
 					'label'    => __( 'Typography', 'menu-login' ),
-					'selector' => '.menu-login-wrapper-{{ID}} .menu-login-user-name',
+					'selector' => '{{WRAPPER}} .menu-login-user-name',
 				]
 			);
 			$this->end_controls_tab();
@@ -651,9 +841,12 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'customer_name_hover_color',
 				[
-					'label'   => __( 'Name Hover Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Name Hover Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-link:hover .menu-login-user-name' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -661,16 +854,16 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'customer_name_typography_hover',
 					'label'    => __( 'Typography (Hover)', 'menu-login' ),
-					'selector' => '.menu-login-wrapper-{{ID}} .menu-login-user-name:hover',
+					'selector' => '{{WRAPPER}} .menu-login-link:hover .menu-login-user-name',
 				]
 			);
 			$this->end_controls_tab();
 			$this->end_controls_tabs();
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Login Popup Style
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_login_popup_style',
 				[
@@ -681,9 +874,12 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'login_popup_background_color',
 				[
-					'label'   => __( 'Popup Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Popup Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-content-{{ID}}' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
@@ -692,36 +888,45 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Popup Border Radius', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '8',
-						'right'  => '8',
-						'bottom' => '8',
-						'left'   => '8',
-						'unit'   => 'px',
+						'top'      => '8',
+						'right'    => '8',
+						'bottom'   => '8',
+						'left'     => '8',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} #menu-login-ajax-content-{{ID}}' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->add_control(
 				'login_popup_border_color',
 				[
-					'label'   => __( 'Popup Border Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ccc',
+					'label'     => __( 'Popup Border Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ccc',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-content-{{ID}}' => 'border-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'login_popup_border_style',
 				[
-					'label'   => __( 'Popup Border Style', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'options' => [
+					'label'     => __( 'Popup Border Style', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::SELECT,
+					'options'   => [
 						'none'   => __( 'None', 'menu-login' ),
 						'solid'  => __( 'Solid', 'menu-login' ),
 						'dashed' => __( 'Dashed', 'menu-login' ),
 						'dotted' => __( 'Dotted', 'menu-login' ),
 						'double' => __( 'Double', 'menu-login' ),
 					],
-					'default' => 'solid',
+					'default'   => 'solid',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-content-{{ID}}' => 'border-style: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
@@ -730,12 +935,15 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Popup Border Width', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '1',
-						'right'  => '1',
-						'bottom' => '1',
-						'left'   => '1',
-						'unit'   => 'px',
+						'top'      => '1',
+						'right'    => '1',
+						'bottom'   => '1',
+						'left'     => '1',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} #menu-login-ajax-content-{{ID}}' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
@@ -745,12 +953,15 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Popup Padding', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '20',
-						'right'  => '20',
-						'bottom' => '20',
-						'left'   => '20',
-						'unit'   => 'px',
+						'top'      => '20',
+						'right'    => '20',
+						'bottom'   => '20',
+						'left'     => '20',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} #menu-login-ajax-content-{{ID}}' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
@@ -760,20 +971,23 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Popup Margin', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '0',
-						'right'  => '0',
-						'bottom' => '0',
-						'left'   => '0',
-						'unit'   => 'px',
+						'top'      => '0',
+						'right'    => '0',
+						'bottom'   => '0',
+						'left'     => '0',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} #menu-login-ajax-content-{{ID}}' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Input Field Style
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_login_input_style',
 				[
@@ -787,17 +1001,23 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'input_background_color',
 				[
-					'label'   => __( 'Input Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Input Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'input_text_color',
 				[
-					'label'   => __( 'Input Text Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#333333',
+					'label'     => __( 'Input Text Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#333333',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -805,98 +1025,119 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'input_typography_normal',
 					'label'    => __( 'Typography', 'menu-login' ),
-					'selector' => '#menu-login-ajax-form-{{ID}} input, #menu-register-ajax-form-{{ID}} input',
+					'selector' => '{{WRAPPER}} #menu-login-ajax-form-{{ID}} input, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input',
 				]
 			);
 			$this->add_responsive_control(
 				'input_border_radius',
 				[
-					'label'   => __( 'Input Border Radius', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::DIMENSIONS,
-					'default' => [
-						'top'    => '4',
-						'right'  => '4',
-						'bottom' => '4',
-						'left'   => '4',
-						'unit'   => 'px',
+					'label'      => __( 'Input Border Radius', 'menu-login' ),
+					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+					'default'    => [
+						'top'      => '4',
+						'right'    => '4',
+						'bottom'   => '4',
+						'left'     => '4',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->add_control(
 				'input_border_color',
 				[
-					'label'   => __( 'Input Border Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ccc',
+					'label'     => __( 'Input Border Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ccc',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input' => 'border-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'input_border_style',
 				[
-					'label'   => __( 'Input Border Style', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'options' => [
+					'label'     => __( 'Input Border Style', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::SELECT,
+					'options'   => [
 						'none'   => __( 'None', 'menu-login' ),
 						'solid'  => __( 'Solid', 'menu-login' ),
 						'dashed' => __( 'Dashed', 'menu-login' ),
 						'dotted' => __( 'Dotted', 'menu-login' ),
 						'double' => __( 'Double', 'menu-login' ),
 					],
-					'default' => 'solid',
+					'default'   => 'solid',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input' => 'border-style: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
 				'input_border_width',
 				[
-					'label'   => __( 'Input Border Width', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::DIMENSIONS,
-					'default' => [
-						'top'    => '1',
-						'right'  => '1',
-						'bottom' => '1',
-						'left'   => '1',
-						'unit'   => 'px',
+					'label'      => __( 'Input Border Width', 'menu-login' ),
+					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+					'default'    => [
+						'top'      => '1',
+						'right'    => '1',
+						'bottom'   => '1',
+						'left'     => '1',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->add_responsive_control(
 				'input_outline_width',
 				[
-					'label'   => __( 'Input Outline Width', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::DIMENSIONS,
-					'default' => [
-						'top'    => '0',
-						'right'  => '0',
-						'bottom' => '0',
-						'left'   => '0',
-						'unit'   => 'px',
+					'label'      => __( 'Input Outline Width', 'menu-login' ),
+					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+					'default'    => [
+						'top'      => '0',
+						'right'    => '0',
+						'bottom'   => '0',
+						'left'     => '0',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input' => 'outline-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->add_control(
 				'input_outline_style',
 				[
-					'label'   => __( 'Input Outline Style', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'options' => [
+					'label'     => __( 'Input Outline Style', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::SELECT,
+					'options'   => [
 						'none'   => __( 'None', 'menu-login' ),
 						'solid'  => __( 'Solid', 'menu-login' ),
 						'dashed' => __( 'Dashed', 'menu-login' ),
 						'dotted' => __( 'Dotted', 'menu-login' ),
 						'double' => __( 'Double', 'menu-login' ),
 					],
-					'default' => 'none',
+					'default'   => 'none',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input' => 'outline-style: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'input_outline_color',
 				[
-					'label'   => __( 'Input Outline Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#000000',
+					'label'     => __( 'Input Outline Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#000000',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input' => 'outline-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->end_controls_tab();
@@ -906,17 +1147,23 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'input_active_background_color',
 				[
-					'label'   => __( 'Active Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Active Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:active, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:active' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'input_active_text_color',
 				[
-					'label'   => __( 'Active Text Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#333333',
+					'label'     => __( 'Active Text Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#333333',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:active, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:active' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -924,61 +1171,75 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'input_typography_active',
 					'label'    => __( 'Typography (Active)', 'menu-login' ),
-					'selector' => '#menu-login-ajax-form-{{ID}} input:active, #menu-register-ajax-form-{{ID}} input:active',
+					'selector' => '{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:active, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:active',
 				]
 			);
 			$this->add_responsive_control(
 				'input_active_border_radius',
 				[
-					'label'   => __( 'Active Border Radius', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::DIMENSIONS,
-					'default' => [
-						'top'    => '4',
-						'right'  => '4',
-						'bottom' => '4',
-						'left'   => '4',
-						'unit'   => 'px',
+					'label'     => __( 'Active Border Radius', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::DIMENSIONS,
+					'default'   => [
+						'top'      => '4',
+						'right'    => '4',
+						'bottom'   => '4',
+						'left'     => '4',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:active, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:active' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->add_control(
 				'input_active_border_color',
-
 				[
-					'label'   => __( 'Active Border Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ccc',
+					'label'     => __( 'Active Border Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ccc',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:active, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:active' => 'border-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
 				'input_active_outline_width',
 				[
-					'label'   => __( 'Active Outline Width', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::DIMENSIONS,
+					'label'     => __( 'Active Outline Width', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::DIMENSIONS,
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:active, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:active' => 'outline-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					],
 				]
 			);
 			$this->add_control(
 				'input_active_outline_style',
 				[
-					'label'   => __( 'Active Outline Style', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'options' => [
+					'label'     => __( 'Active Outline Style', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::SELECT,
+					'options'   => [
 						'none'   => __( 'None', 'menu-login' ),
 						'solid'  => __( 'Solid', 'menu-login' ),
 						'dashed' => __( 'Dashed', 'menu-login' ),
 						'dotted' => __( 'Dotted', 'menu-login' ),
 						'double' => __( 'Double', 'menu-login' ),
 					],
-					'default' => 'none',
+					'default'   => 'none',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:active, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:active' => 'outline-style: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'input_active_outline_color',
 				[
-					'label'   => __( 'Active Outline Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#000000',
+					'label'     => __( 'Active Outline Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#000000',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:active, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:active' => 'outline-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->end_controls_tab();
@@ -988,39 +1249,51 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'input_focused_background_color',
 				[
-					'label'   => __( 'Focused Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#f7f7f7',
+					'label'     => __( 'Focused Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#f7f7f7',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:focus, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:focus, {{WRAPPER}} .menu-login-wrapper-{{ID}} input:focus' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'input_focused_text_color',
 				[
-					'label'   => __( 'Focused Text Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#333333',
+					'label'     => __( 'Focused Text Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#333333',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:focus, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:focus, {{WRAPPER}} .menu-login-wrapper-{{ID}} input:focus' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'input_focused_border_color',
 				[
-					'label'   => __( 'Focused Border Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ccc',
+					'label'     => __( 'Focused Border Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ccc',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:focus, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:focus, {{WRAPPER}} .menu-login-wrapper-{{ID}} input:focus' => 'border-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
 				'input_focused_border_radius',
 				[
-					'label'   => __( 'Focused Border Radius', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::DIMENSIONS,
-					'default' => [
-						'top'    => '4',
-						'right'  => '4',
-						'bottom' => '4',
-						'left'   => '4',
-						'unit'   => 'px',
+					'label'     => __( 'Focused Border Radius', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::DIMENSIONS,
+					'default'   => [
+						'top'      => '4',
+						'right'    => '4',
+						'bottom'   => '4',
+						'left'     => '4',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:focus, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:focus, {{WRAPPER}} .menu-login-wrapper-{{ID}} input:focus' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
@@ -1029,46 +1302,55 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'input_typography_focused',
 					'label'    => __( 'Typography (Focused)', 'menu-login' ),
-					'selector' => '#menu-login-ajax-form-{{ID}} input:focus, #menu-register-ajax-form-{{ID}} input:focus, .menu-login-wrapper-{{ID}} input:focus',
+					'selector' => '{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:focus, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:focus, {{WRAPPER}} .menu-login-wrapper-{{ID}} input:focus',
 				]
 			);
 			$this->add_responsive_control(
 				'input_focused_outline_width',
 				[
-					'label'   => __( 'Focused Outline Width', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::DIMENSIONS,
+					'label'     => __( 'Focused Outline Width', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::DIMENSIONS,
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:focus, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:focus, {{WRAPPER}} .menu-login-wrapper-{{ID}} input:focus' => 'outline-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					],
 				]
 			);
 			$this->add_control(
 				'input_focused_outline_style',
 				[
-					'label'   => __( 'Focused Outline Style', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'options' => [
+					'label'     => __( 'Focused Outline Style', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::SELECT,
+					'options'   => [
 						'none'   => __( 'None', 'menu-login' ),
 						'solid'  => __( 'Solid', 'menu-login' ),
 						'dashed' => __( 'Dashed', 'menu-login' ),
 						'dotted' => __( 'Dotted', 'menu-login' ),
 						'double' => __( 'Double', 'menu-login' ),
 					],
-					'default' => 'none',
+					'default'   => 'none',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:focus, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:focus, {{WRAPPER}} .menu-login-wrapper-{{ID}} input:focus' => 'outline-style: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'input_focused_outline_color',
 				[
-					'label'   => __( 'Focused Outline Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#000000',
+					'label'     => __( 'Focused Outline Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#000000',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-form-{{ID}} input:focus, {{WRAPPER}} #menu-register-ajax-form-{{ID}} input:focus, {{WRAPPER}} .menu-login-wrapper-{{ID}} input:focus' => 'outline-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->end_controls_tab();
 			$this->end_controls_tabs();
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Login Loading Style
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_login_loading_style',
 				[
@@ -1082,36 +1364,45 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Loading Padding', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '20',
-						'right'  => '20',
-						'bottom' => '20',
-						'left'   => '20',
-						'unit'   => 'px',
+						'top'      => '20',
+						'right'    => '20',
+						'bottom'   => '20',
+						'left'     => '20',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} #menu-login-loading-{{ID}} div' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->add_control(
 				'login_loading_background_color',
 				[
-					'label'   => __( 'Loading Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => 'transparent',
+					'label'     => __( 'Loading Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => 'transparent',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-loading-{{ID}} div' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'login_loading_svg_color',
 				[
-					'label'   => __( 'Loading SVG Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#333333',
+					'label'     => __( 'Loading SVG Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#333333',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-loading-{{ID}} div' => 'border-top-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Login Error Message Style
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_login_error_style',
 				[
@@ -1122,9 +1413,12 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'login_error_text_color',
 				[
-					'label'   => __( 'Error Text Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ff0000',
+					'label'     => __( 'Error Text Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ff0000',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-error-msg-{{ID}}, {{WRAPPER}} #menu-register-error-msg-{{ID}}' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -1132,7 +1426,7 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'login_error_typography',
 					'label'    => __( 'Typography', 'menu-login' ),
-					'selector' => '#menu-login-ajax-popup-{{ID}} #menu-login-error-msg-{{ID}}',
+					'selector' => '{{WRAPPER}} #menu-login-error-msg-{{ID}}, {{WRAPPER}} #menu-register-error-msg-{{ID}}',
 				]
 			);
 			$this->add_responsive_control(
@@ -1141,20 +1435,23 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Error Padding', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '10',
-						'right'  => '10',
-						'bottom' => '10',
-						'left'   => '10',
-						'unit'   => 'px',
+						'top'      => '10',
+						'right'    => '10',
+						'bottom'   => '10',
+						'left'     => '10',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} #menu-login-error-msg-{{ID}}, {{WRAPPER}} #menu-register-error-msg-{{ID}}' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Login Title Style
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_login_title_style',
 				[
@@ -1165,9 +1462,12 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'login_title_color',
 				[
-					'label'   => __( 'Title Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Title Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-popup-{{ID}} .menu-login-title' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -1175,14 +1475,14 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'login_title_typography',
 					'label'    => __( 'Typography', 'menu-login' ),
-					'selector' => '#menu-login-ajax-popup-{{ID}} .menu-login-title',
+					'selector' => '{{WRAPPER}} #menu-login-ajax-popup-{{ID}} .menu-login-title',
 				]
 			);
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Login Field Label Style
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_login_field_label_style',
 				[
@@ -1193,9 +1493,12 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'login_field_label_color',
 				[
-					'label'   => __( 'Label Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Label Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} #menu-login-ajax-popup-{{ID}} .menu-login-field-label' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -1203,14 +1506,14 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'login_field_label_typography',
 					'label'    => __( 'Typography', 'menu-login' ),
-					'selector' => '#menu-login-ajax-popup-{{ID}} .menu-login-field-label',
+					'selector' => '{{WRAPPER}} #menu-login-ajax-popup-{{ID}} .menu-login-field-label',
 				]
 			);
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Login Button Style
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_login_button_style',
 				[
@@ -1224,9 +1527,12 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'login_button_text_color',
 				[
-					'label'   => __( 'Button Text Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Button Text Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-button' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -1243,12 +1549,15 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Button Padding', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '8',
-						'right'  => '12',
-						'bottom' => '8',
-						'left'   => '12',
-						'unit'   => 'px',
+						'top'      => '8',
+						'right'    => '12',
+						'bottom'   => '8',
+						'left'     => '12',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
@@ -1258,44 +1567,56 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Button Margin', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '10',
-						'right'  => '0',
-						'bottom' => '0',
-						'left'   => '0',
-						'unit'   => 'px',
+						'top'      => '10',
+						'right'    => '0',
+						'bottom'   => '0',
+						'left'     => '0',
+						'unit'     => 'px',
 						'isLinked' => false,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-button' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
 			$this->add_control(
 				'login_button_background_color',
 				[
-					'label'   => __( 'Button Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#0073aa',
+					'label'     => __( 'Button Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#0073aa',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-button' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'login_button_border_style',
 				[
-					'label'   => __( 'Button Border Style', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'options' => [
+					'label'     => __( 'Button Border Style', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::SELECT,
+					'options'   => [
 						'none'   => __( 'None', 'menu-login' ),
 						'solid'  => __( 'Solid', 'menu-login' ),
 						'dashed' => __( 'Dashed', 'menu-login' ),
 						'dotted' => __( 'Dotted', 'menu-login' ),
 						'double' => __( 'Double', 'menu-login' ),
 					],
-					'default' => 'none',
+					'default'   => 'none',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-button' => 'border-style: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
 				'login_button_border_color',
 				[
-					'label'   => __( 'Button Border Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#0073aa',
+					'label'      => __( 'Button Border Color', 'menu-login' ),
+					'type'       => \Elementor\Controls_Manager::COLOR,
+					'default'    => '#0073aa',
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-button' => 'border-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
@@ -1304,12 +1625,15 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Button Border Radius', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '4',
-						'right'  => '4',
-						'bottom' => '4',
-						'left'   => '4',
-						'unit'   => 'px',
+						'top'      => '4',
+						'right'    => '4',
+						'bottom'   => '4',
+						'left'     => '4',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
@@ -1319,12 +1643,15 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Button Border Width', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '1',
-						'right'  => '1',
-						'bottom' => '1',
-						'left'   => '1',
-						'unit'   => 'px',
+						'top'      => '1',
+						'right'    => '1',
+						'bottom'   => '1',
+						'left'     => '1',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-button' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
@@ -1335,34 +1662,43 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'login_button_hover_text_color',
 				[
-					'label'   => __( 'Button Text Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#ffffff',
+					'label'     => __( 'Button Text Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#ffffff',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-button:hover' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'login_button_hover_background_color',
 				[
-					'label'   => __( 'Button Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#006799',
+					'label'     => __( 'Button Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#006799',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-button:hover' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
 				'login_button_hover_border_color',
 				[
-					'label'   => __( 'Button Border Color (Hover)', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#006799',
+					'label'      => __( 'Button Border Color (Hover)', 'menu-login' ),
+					'type'       => \Elementor\Controls_Manager::COLOR,
+					'default'    => '#006799',
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-button:hover' => 'border-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->end_controls_tab();
 			$this->end_controls_tabs();
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Cancel Button Style
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_cancel_button_style',
 				[
@@ -1376,32 +1712,41 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'cancel_button_background_color',
 				[
-					'label'   => __( 'Button Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#cccccc',
+					'label'     => __( 'Button Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#cccccc',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-cancel-button' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'cancel_button_border_style',
 				[
-					'label'   => __( 'Button Border Style', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'options' => [
+					'label'     => __( 'Button Border Style', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::SELECT,
+					'options'   => [
 						'none'   => __( 'None', 'menu-login' ),
 						'solid'  => __( 'Solid', 'menu-login' ),
 						'dashed' => __( 'Dashed', 'menu-login' ),
 						'dotted' => __( 'Dotted', 'menu-login' ),
 						'double' => __( 'Double', 'menu-login' ),
 					],
-					'default' => 'none',
+					'default'   => 'none',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-cancel-button' => 'border-style: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
 				'cancel_button_border_color',
 				[
-					'label'   => __( 'Button Border Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#cccccc',
+					'label'      => __( 'Button Border Color', 'menu-login' ),
+					'type'       => \Elementor\Controls_Manager::COLOR,
+					'default'    => '#cccccc',
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-cancel-button' => 'border-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_responsive_control(
@@ -1410,12 +1755,15 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Button Border Radius', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '4',
-						'right'  => '4',
-						'bottom' => '4',
-						'left'   => '4',
-						'unit'   => 'px',
+						'top'      => '4',
+						'right'    => '4',
+						'bottom'   => '4',
+						'left'     => '4',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-cancel-button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
@@ -1425,12 +1773,15 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Button Border Width', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '1',
-						'right'  => '1',
-						'bottom' => '1',
-						'left'   => '1',
-						'unit'   => 'px',
+						'top'      => '1',
+						'right'    => '1',
+						'bottom'   => '1',
+						'left'     => '1',
+						'unit'     => 'px',
 						'isLinked' => true,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-cancel-button' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
@@ -1440,12 +1791,15 @@ if ( did_action( 'elementor/loaded' ) ) {
 					'label'      => __( 'Button Margin', 'menu-login' ),
 					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 					'default'    => [
-						'top'    => '10',
-						'right'  => '0',
-						'bottom' => '0',
-						'left'   => '0',
-						'unit'   => 'px',
+						'top'      => '10',
+						'right'    => '0',
+						'bottom'   => '0',
+						'left'     => '0',
+						'unit'     => 'px',
 						'isLinked' => false,
+					],
+					'selectors'  => [
+						'{{WRAPPER}} .menu-login-cancel-button' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					],
 				]
 			);
@@ -1454,15 +1808,18 @@ if ( did_action( 'elementor/loaded' ) ) {
 				[
 					'name'     => 'cancel_button_typography',
 					'label'    => __( 'Typography', 'menu-login' ),
-					'selector' => '#menu-login-ajax-popup-{{ID}} .menu-login-cancel-button',
+					'selector' => '{{WRAPPER}} #menu-login-ajax-popup-{{ID}} .menu-login-cancel-button',
 				]
 			);
 			$this->add_control(
 				'cancel_button_text_color',
 				[
-					'label'   => __( 'Text Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#000000',
+					'label'     => __( 'Text Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#000000',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-cancel-button' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->end_controls_tab();
@@ -1471,34 +1828,43 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'cancel_button_active_background_color',
 				[
-					'label'   => __( 'Button Background Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#aaaaaa',
+					'label'     => __( 'Button Background Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#aaaaaa',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-cancel-button:hover' => 'background-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'cancel_button_active_border_color',
 				[
-					'label'   => __( 'Button Border Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#aaaaaa',
+					'label'     => __( 'Button Border Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#aaaaaa',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-cancel-button:hover' => 'border-color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_control(
 				'cancel_button_active_text_color',
 				[
-					'label'   => __( 'Text Color (Hover)', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#000000',
+					'label'     => __( 'Text Color (Hover)', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#000000',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-cancel-button:hover' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->end_controls_tab();
 			$this->end_controls_tabs();
 			$this->end_controls_section();
 
-			// -------------------------------------------
+			// ==========================================
 			// STYLE TAB: Register Link Style
-			// -------------------------------------------
+			// ==========================================
 			$this->start_controls_section(
 				'section_register_link_style',
 				[
@@ -1512,9 +1878,12 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'register_link_text_color',
 				[
-					'label'   => __( 'Text Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#0073aa',
+					'label'     => __( 'Text Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#0073aa',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-register a' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -1531,9 +1900,12 @@ if ( did_action( 'elementor/loaded' ) ) {
 			$this->add_control(
 				'register_link_hover_text_color',
 				[
-					'label'   => __( 'Text Hover Color', 'menu-login' ),
-					'type'    => \Elementor\Controls_Manager::COLOR,
-					'default' => '#005177',
+					'label'     => __( 'Text Hover Color', 'menu-login' ),
+					'type'      => \Elementor\Controls_Manager::COLOR,
+					'default'   => '#005177',
+					'selectors' => [
+						'{{WRAPPER}} .menu-login-register a:hover' => 'color: {{VALUE}};',
+					],
 				]
 			);
 			$this->add_group_control(
@@ -1573,260 +1945,47 @@ if ( did_action( 'elementor/loaded' ) ) {
 				$customer_name = ( mb_strlen( $username ) > 20 ) ? mb_substr( $username, 0, 17 ) . '...' : $username;
 			}
 
-			$breaks    = $this->get_elementor_breakpoints();
-			$tablet_bp = $breaks['tablet'];
-			$mobile_bp = $breaks['mobile'];
+			// Get all dynamic breakpoints (e.g. tablet, mobile, etc.)
+			$breaks = $this->get_elementor_breakpoints();
 
-			$desktop_msg_layout = $settings['menu_message_layout'] ?? 'row';
-			$tablet_msg_layout  = $settings['menu_message_layout_tablet'] ?? $desktop_msg_layout;
-			$mobile_msg_layout  = $settings['menu_message_layout_mobile'] ?? $tablet_msg_layout;
+			// Define layouts for each breakpoint.
+			// First, set a default desktop layout.
+			$layouts = [];
+			$layouts['desktop'] = $settings['menu_message_layout'] ?? 'row';
 
-			$desktop_message_css = ( $desktop_msg_layout === 'off' )
-				? 'display: none;'
-				: 'display: flex; flex-direction: ' . ( $desktop_msg_layout === 'row' ? 'row' : 'column' ) . ';';
-			$tablet_message_css  = ( $tablet_msg_layout === 'off' )
-				? 'display: none;'
-				: 'display: flex; flex-direction: ' . ( $tablet_msg_layout === 'row' ? 'row' : 'column' ) . ';';
-			$mobile_message_css  = ( $mobile_msg_layout === 'off' )
-				? 'display: none;'
-				: 'display: flex; flex-direction: ' . ( $mobile_msg_layout === 'row' ? 'row' : 'column' ) . ';';
+			// Loop over each dynamic breakpoint.
+			// We assume the setting keys follow the pattern: menu_message_layout_<breakpoint>
+			foreach ( $breaks as $breakpoint => $bp_value ) {
+				$setting_key = 'menu_message_layout_' . $breakpoint;
+				// If no specific setting is defined for the breakpoint, use the last defined layout.
+				$fallback = end($layouts);
+				$layouts[ $breakpoint ] = $settings[ $setting_key ] ?? $fallback;
+			}
 
-			// Build dynamic CSS string.
-			$dynamic_css = "
-			/* Desktop Styles */
-			.{$wrapper_class} .menu-login-wrapper {
-				margin: " . $this->print_dimension( $settings['menu_login_margin'] ) . ";
+			// Now, build the responsive CSS for each breakpoint.
+			$responsive_css = [];
+			foreach ( $layouts as $breakpoint => $layout ) {
+				$responsive_css[ $breakpoint ] = ( $layout === 'off' )
+					? 'display: none !important;'
+					: 'display: flex; flex-direction: ' . ( $layout === 'row' ? 'row' : 'column' ) . '!important;';
 			}
-			.{$wrapper_class} .menu-login-messages { {$desktop_message_css} gap:4px; }
-			.{$wrapper_class} .menu-login-icon.unlogged {
-				background-color: " . esc_html( $settings['logged_out_icon_background_color'] ) . ";
-				width: " . $this->print_single_dimension( $settings['logged_out_icon_size'] ) . ";
-				height: " . $this->print_single_dimension( $settings['logged_out_icon_size'] ) . ";
-				padding: " . $this->print_dimension( $settings['logged_out_icon_padding'] ) . ";
-				border-radius: " . $this->print_dimension( $settings['logged_out_icon_border_radius'] ) . ";
-				border-style: " . esc_html( $settings['logged_out_icon_border_style'] ) . ";
-				border-width: " . $this->print_dimension( $settings['logged_out_icon_border_width'] ) . ";
-				border-color: " . esc_html( $settings['logged_out_icon_border_color'] ) . ";
-			}
-			.{$wrapper_class} .menu-login-icon.unlogged .menu-login-svg-icon {
-				fill: " . esc_html( $settings['logged_out_icon_color'] ) . " !important;
-			}
-			.{$wrapper_class} .menu-login-link:hover .menu-login-icon.unlogged {
-				background-color: " . esc_html( $settings['logged_out_icon_hover_background_color'] ) . ";
-				border-radius: " . $this->print_dimension( $settings['logged_out_icon_hover_border_radius'] ) . ";
-				border-style: " . esc_html( $settings['logged_out_icon_hover_border_style'] ) . ";
-				border-width: " . $this->print_dimension( $settings['logged_out_icon_hover_border_width'] ) . ";
-				border-color: " . esc_html( $settings['logged_out_icon_hover_border_color'] ) . ";
-			}
-			.{$wrapper_class} .menu-login-link:hover .menu-login-icon.unlogged .menu-login-svg-icon {
-				fill: " . esc_html( $settings['logged_out_icon_hover_color'] ) . " !important;
-			}
-			.{$wrapper_class} .menu-login-icon.loggedin-new {
-				color: " . esc_html( $settings['logged_in_letter_color'] ) . " !important;
-				background-color: " . esc_html( $settings['logged_in_letter_background_color'] ) . " !important;
-				padding: " . $this->print_dimension( $settings['logged_in_letter_padding'] ) . " !important;
-				border-radius: " . $this->print_dimension( $settings['logged_in_letter_border_radius'] ) . " !important;
-				border-style: " . esc_html( $settings['logged_in_letter_border_style'] ) . " !important;
-				border-width: " . $this->print_dimension( $settings['logged_in_letter_border_width'] ) . " !important;
-				border-color: " . esc_html( $settings['logged_in_letter_border_color'] ) . " !important;
-				display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important;
-			}
-			.{$wrapper_class} .menu-login-link:hover .menu-login-icon.loggedin-new {
-				color: " . esc_html( $settings['logged_in_letter_hover_color'] ) . " !important;
-				background-color: " . esc_html( $settings['logged_in_letter_hover_background_color'] ) . " !important;
-				border-radius: " . $this->print_dimension( $settings['logged_in_letter_hover_border_radius'] ) . " !important;
-				border-style: " . esc_html( $settings['logged_in_letter_hover_border_style'] ) . " !important;
-				border-width: " . $this->print_dimension( $settings['logged_in_letter_hover_border_width'] ) . " !important;
-				border-color: " . esc_html( $settings['logged_in_letter_hover_border_color'] ) . " !important;
-			}
-			.{$wrapper_class} a .menu-login-icon.unlogged ~ .menu-login-messages .menu-login-welcome {
-				color: " . esc_html( $settings['welcome_message_text_color'] ) . ";
-			}
-			.{$wrapper_class} .menu-login-icon.loggedin-new + .menu-login-messages .menu-login-welcome {
-				color: " . esc_html( $settings['message_text_color'] ) . ";
-			}
-			.{$wrapper_class} .menu-login-icon.loggedin-new + .menu-login-messages .menu-login-welcome:hover {
-				color: " . esc_html( $settings['message_text_hover_color'] ) . ";
-			}
-			.{$wrapper_class} .menu-login-user-name {
-				color: " . esc_html( $settings['customer_name_color'] ) . ";
-			}
-			.{$wrapper_class} .menu-login-link:hover .menu-login-user-name {
-				color: " . esc_html( $settings['customer_name_hover_color'] ) . ";
-			}
-			#menu-login-ajax-popup-" . esc_attr( $this->get_id() ) . " {
-				background-color: rgba(0,0,0,0.7);
-			}
-			#menu-login-ajax-content-" . esc_attr( $this->get_id() ) . " {
-				background-color: " . esc_html( $settings['login_popup_background_color'] ) . ";
-				padding: " . $this->print_dimension( $settings['login_popup_padding'] ) . ";
-				border-radius: " . $this->print_dimension( $settings['login_popup_border_radius'] ) . ";
-				border: " . $this->print_dimension( $settings['login_popup_border_width'] ) . " " . esc_html( $settings['login_popup_border_style'] ) . " " . esc_html( $settings['login_popup_border_color'] ) . ";
-				margin: " . $this->print_dimension( $settings['login_popup_margin'] ) . ";
-			}
-			#menu-login-ajax-form-" . esc_attr( $this->get_id() ) . " input,
-			#menu-register-ajax-form-" . esc_attr( $this->get_id() ) . " input {
-				background-color: " . esc_html( $settings['input_background_color'] ) . ";
-				color: " . esc_html( $settings['input_text_color'] ) . ";
-				border-radius: " . $this->print_dimension( $settings['input_border_radius'] ) . ";
-				border-color: " . esc_html( $settings['input_border_color'] ) . ";
-				border-style: " . esc_html( $settings['input_border_style'] ) . ";
-				border-width: " . $this->print_dimension( $settings['input_border_width'] ) . ";
-				outline-width: " . $this->print_dimension( $settings['input_outline_width'] ) . ";
-				outline-style: " . esc_html( $settings['input_outline_style'] ) . ";
-				outline-color: " . esc_html( $settings['input_outline_color'] ) . ";
-			}
-			#menu-login-ajax-form-" . esc_attr( $this->get_id() ) . " input:active,
-			#menu-register-ajax-form-" . esc_attr( $this->get_id() ) . " input:active {
-				background-color: " . esc_html( $settings['input_active_background_color'] ) . ";
-				color: " . esc_html( $settings['input_active_text_color'] ) . ";
-				border-color: " . esc_html( $settings['input_active_border_color'] ) . ";
-				border-radius: " . $this->print_dimension( $settings['input_active_border_radius'] ) . ";
-				outline-width: " . $this->print_dimension( $settings['input_active_outline_width'] ) . ";
-				outline-style: " . esc_html( $settings['input_active_outline_style'] ) . ";
-				outline-color: " . esc_html( $settings['input_active_outline_color'] ) . ";
-			}
-			#menu-login-ajax-form-" . esc_attr( $this->get_id() ) . " input:focus,
-			#menu-register-ajax-form-" . esc_attr( $this->get_id() ) . " input:focus,
-			.menu-login-wrapper-" . esc_attr( $this->get_id() ) . " input:focus {
-				background-color: " . esc_html( $settings['input_focused_background_color'] ) . " !important;
-				color: " . esc_html( $settings['input_focused_text_color'] ) . " !important;
-				border-color: " . esc_html( $settings['input_focused_border_color'] ) . " !important;
-				border-radius: " . $this->print_dimension( $settings['input_focused_border_radius'] ) . " !important;
-				outline-width: " . $this->print_dimension( $settings['input_focused_outline_width'] ) . ";
-				outline-style: " . esc_html( $settings['input_focused_outline_style'] ) . ";
-				outline-color: " . esc_html( $settings['input_focused_outline_color'] ) . ";
-			}
-			#menu-login-loading-" . esc_attr( $this->get_id() ) . " div {
-				padding: " . $this->print_dimension( $settings['login_loading_padding'] ) . ";
-				background-color: " . esc_html( $settings['login_loading_background_color'] ) . ";
-				border-top-color: " . esc_html( $settings['login_loading_svg_color'] ) . ";
-				border-radius: 50%;
-				animation: spin 1s linear infinite;
-			}
-			#menu-login-error-msg-" . esc_attr( $this->get_id() ) . " {
-				color: " . esc_html( $settings['login_error_text_color'] ) . ";
-				padding: " . $this->print_dimension( $settings['login_error_padding'] ) . ";
-			}
-			#menu-login-ajax-popup-" . esc_attr( $this->get_id() ) . " .menu-login-title {
-				color: " . esc_html( $settings['login_title_color'] ) . ";
-			}
-			#menu-login-ajax-popup-" . esc_attr( $this->get_id() ) . " .menu-login-field-label {
-				color: " . esc_html( $settings['login_field_label_color'] ) . ";
-			}
-			#menu-login-ajax-popup-" . esc_attr( $this->get_id() ) . " .menu-login-button {
-				color: " . esc_html( $settings['login_button_text_color'] ) . ";
-				padding: " . $this->print_dimension( $settings['login_button_padding'] ) . ";
-				margin: " . $this->print_dimension( $settings['login_button_margin'] ) . ";
-				background-color: " . esc_html( $settings['login_button_background_color'] ) . ";
-				border-style: " . esc_html( $settings['login_button_border_style'] ) . ";
-				border-color: " . esc_html( $settings['login_button_border_color'] ) . ";
-				border-radius: " . $this->print_dimension( $settings['login_button_border_radius'] ) . ";
-				border-width: " . $this->print_dimension( $settings['login_button_border_width'] ) . ";
-			}
-			#menu-login-ajax-popup-" . esc_attr( $this->get_id() ) . " .menu-login-button:hover {
-				color: " . esc_html( $settings['login_button_hover_text_color'] ) . ";
-				background-color: " . esc_html( $settings['login_button_hover_background_color'] ) . ";
-				border-color: " . esc_html( $settings['login_button_hover_border_color'] ) . ";
-			}
-			#menu-login-ajax-popup-" . esc_attr( $this->get_id() ) . " .menu-login-cancel-button {
-				color: " . esc_html( $settings['cancel_button_text_color'] ) . ";
-				background-color: " . esc_html( $settings['cancel_button_background_color'] ) . ";
-				border-style: " . esc_html( $settings['cancel_button_border_style'] ) . ";
-				border-color: " . esc_html( $settings['cancel_button_border_color'] ) . ";
-				border-radius: " . $this->print_dimension( $settings['cancel_button_border_radius'] ) . ";
-				border-width: " . $this->print_dimension( $settings['cancel_button_border_width'] ) . ";
-				margin: " . $this->print_dimension( $settings['cancel_button_margin'] ) . ";
-			}
-			#menu-login-ajax-popup-" . esc_attr( $this->get_id() ) . " .menu-login-cancel-button:hover {
-				color: " . esc_html( $settings['cancel_button_active_text_color'] ) . ";
-				background-color: " . esc_html( $settings['cancel_button_active_background_color'] ) . ";
-				border-color: " . esc_html( $settings['cancel_button_active_border_color'] ) . ";
-			}
-			.menu-login-register a {
-				color: " . esc_html( $settings['register_link_text_color'] ) . ";
-			}
-			.menu-login-register a:hover {
-				color: " . esc_html( $settings['register_link_hover_text_color'] ) . ";
-			}
-			/* Tablet Styles */
-			@media (max-width: {$tablet_bp}px) {
-				.{$wrapper_class} .menu-login-wrapper {
-					margin: " . $this->print_dimension( $settings['menu_login_margin_tablet'] ?? $settings['menu_login_margin'] ) . ";
-				}
-				.{$wrapper_class} .menu-login-messages { {$tablet_message_css} }
-				.{$wrapper_class} .menu-login-icon.unlogged {
-					width: " . $this->print_single_dimension( $settings['logged_out_icon_size_tablet'] ?? $settings['logged_out_icon_size'] ) . ";
-					height: " . $this->print_single_dimension( $settings['logged_out_icon_size_tablet'] ?? $settings['logged_out_icon_size'] ) . ";
-					padding: " . $this->print_dimension( $settings['logged_out_icon_padding_tablet'] ?? $settings['logged_out_icon_padding'] ) . ";
-					border-radius: " . $this->print_dimension( $settings['logged_out_icon_border_radius_tablet'] ?? $settings['logged_out_icon_border_radius'] ) . ";
-					border-width: " . $this->print_dimension( $settings['logged_out_icon_border_width_tablet'] ?? $settings['logged_out_icon_border_width'] ) . ";
-				}
-				.{$wrapper_class} .menu-login-icon.loggedin-new {
-					padding: " . $this->print_dimension( $settings['logged_in_letter_padding_tablet'] ?? $settings['logged_in_letter_padding'] ) . " !important;
-					border-radius: " . $this->print_dimension( $settings['logged_in_letter_border_radius_tablet'] ?? $settings['logged_in_letter_border_radius'] ) . " !important;
-					border-width: " . $this->print_dimension( $settings['logged_in_letter_border_width_tablet'] ?? $settings['logged_in_letter_border_width'] ) . " !important;
-				}
-				#menu-login-ajax-content-" . esc_attr( $this->get_id() ) . " {
-					padding: " . $this->print_dimension( $settings['login_popup_padding_tablet'] ?? $settings['login_popup_padding'] ) . ";
-					border-radius: " . $this->print_dimension( $settings['login_popup_border_radius_tablet'] ?? $settings['login_popup_border_radius'] ) . ";
-					border-width: " . $this->print_dimension( $settings['login_popup_border_width_tablet'] ?? $settings['login_popup_border_width'] ) . ";
-					margin: " . $this->print_dimension( $settings['login_popup_margin_tablet'] ?? $settings['login_popup_margin'] ) . ";
-				}
-				#menu-login-ajax-form-" . esc_attr( $this->get_id() ) . " input,
-				#menu-register-ajax-form-" . esc_attr( $this->get_id() ) . " input {
-					border-radius: " . $this->print_dimension( $settings['input_border_radius_tablet'] ?? $settings['input_border_radius'] ) . ";
-					border-width: " . $this->print_dimension( $settings['input_border_width_tablet'] ?? $settings['input_border_width'] ) . ";
-					outline-width: " . $this->print_dimension( $settings['input_outline_width_tablet'] ?? $settings['input_outline_width'] ) . ";
-				}
-				#menu-login-ajax-form-" . esc_attr( $this->get_id() ) . " input:active,
-				#menu-register-ajax-form-" . esc_attr( $this->get_id() ) . " input:active {
-					border-radius: " . $this->print_dimension( $settings['input_active_border_radius_tablet'] ?? $settings['input_active_border_radius'] ) . ";
-					outline-width: " . $this->print_dimension( $settings['input_active_outline_width_tablet'] ?? $settings['input_active_outline_width'] ) . ";
-				}
-			}
-			/* Mobile Styles */
-			@media (max-width: {$mobile_bp}px) {
-				.{$wrapper_class} .menu-login-wrapper {
-					margin: " . $this->print_dimension( $settings['menu_login_margin_mobile'] ?? $settings['menu_login_margin'] ) . ";
-				}
-				.{$wrapper_class} .menu-login-messages { {$mobile_message_css} }
-				.{$wrapper_class} .menu-login-icon.unlogged {
-					width: " . $this->print_single_dimension( $settings['logged_out_icon_size_mobile'] ?? $settings['logged_out_icon_size'] ) . ";
-					height: " . $this->print_single_dimension( $settings['logged_out_icon_size_mobile'] ?? $settings['logged_out_icon_size'] ) . ";
-					padding: " . $this->print_dimension( $settings['logged_out_icon_padding_mobile'] ?? $settings['logged_out_icon_padding'] ) . ";
-					border-radius: " . $this->print_dimension( $settings['logged_out_icon_border_radius_mobile'] ?? $settings['logged_out_icon_border_radius'] ) . ";
-					border-width: " . $this->print_dimension( $settings['logged_out_icon_border_width_mobile'] ?? $settings['logged_out_icon_border_width'] ) . ";
-				}
-				.{$wrapper_class} .menu-login-icon.loggedin-new {
-					padding: " . $this->print_dimension( $settings['logged_in_letter_padding_mobile'] ?? $settings['logged_in_letter_padding'] ) . " !important;
-					border-radius: " . $this->print_dimension( $settings['logged_in_letter_border_radius_mobile'] ?? $settings['logged_in_letter_border_radius'] ) . " !important;
-					border-width: " . $this->print_dimension( $settings['logged_in_letter_border_width_mobile'] ?? $settings['logged_in_letter_border_width'] ) . " !important;
-				}
-				#menu-login-ajax-content-" . esc_attr( $this->get_id() ) . " {
-					padding: " . $this->print_dimension( $settings['login_popup_padding_mobile'] ?? $settings['login_popup_padding'] ) . ";
-					border-radius: " . $this->print_dimension( $settings['login_popup_border_radius_mobile'] ?? $settings['login_popup_border_radius'] ) . ";
-					border-width: " . $this->print_dimension( $settings['login_popup_border_width_mobile'] ?? $settings['login_popup_border_width'] ) . ";
-					margin: " . $this->print_dimension( $settings['login_popup_margin_mobile'] ?? $settings['login_popup_margin'] ) . ";
-				}
-				#menu-login-ajax-form-" . esc_attr( $this->get_id() ) . " input,
-				#menu-register-ajax-form-" . esc_attr( $this->get_id() ) . " input {
-					border-radius: " . $this->print_dimension( $settings['input_border_radius_mobile'] ?? $settings['input_border_radius'] ) . ";
-					border-width: " . $this->print_dimension( $settings['input_border_width_mobile'] ?? $settings['input_border_width'] ) . ";
-					outline-width: " . $this->print_dimension( $settings['input_outline_width_mobile'] ?? $settings['input_outline_width'] ) . ";
-				}
-				#menu-login-ajax-form-" . esc_attr( $this->get_id() ) . " input:active,
-				#menu-register-ajax-form-" . esc_attr( $this->get_id() ) . " input:active {
-					border-radius: " . $this->print_dimension( $settings['input_active_border_radius_mobile'] ?? $settings['input_active_border_radius'] ) . ";
-					outline-width: " . $this->print_dimension( $settings['input_active_outline_width_mobile'] ?? $settings['input_active_outline_width'] ) . ";
-				}
-			}
-			";
 
-			// Enqueue the static style and add inline dynamic CSS.
+			// Example of how you might output the CSS using media queries.
+			// Note: You may need to adjust this to match how your theme/plugin applies responsive styles.
+			$css = '/* Desktop styles */' . "\n";
+			$css .= '.menu-login-wrapper .menu-login-messages { ' . $responsive_css['desktop'] . ' }' . "\n";
+
+			foreach ( $breaks as $breakpoint => $bp_value ) {
+				if ( ! empty( $bp_value ) ) {
+					$css .= '@media (max-width: ' . $bp_value . 'px) {' . "\n";
+					$css .= "\t.menu-login-wrapper .menu-login-messages { " . $responsive_css[ $breakpoint ] . " }" . "\n";
+					$css .= '}' . "\n";
+				}
+			}
+
 			wp_enqueue_style( 'menu-login-style' );
-			wp_add_inline_style( 'menu-login-style', $dynamic_css );
-
+			wp_add_inline_style( 'menu-login-style', $css );
+			// Then add $css inline or via your preferred method.
 			?>
 			<div class="menu-login-wrapper <?php echo esc_attr( $wrapper_class ); ?>" style="display:inline-flex;align-items:center;gap:8px;">
 				<a href="<?php echo esc_url( $icon_link ); ?>" class="menu-login-link"
@@ -1907,9 +2066,30 @@ if ( did_action( 'elementor/loaded' ) ) {
 								<a href="#" class="menu-toggle-link" style="text-decoration:underline;"><?php esc_html_e( 'Return to Login', 'menu-login' ); ?></a>
 							</div>
 						</div>
-						<div id="menu-login-loading-<?php echo esc_attr( $this->get_id() ); ?>" style="display:none; margin:auto;">
-							<!-- Corrected spinner markup: no extra quotes -->
-							<div style="width:50px; height:50px; margin:auto; border:6px solid #ccc; border-top-color: <?php echo esc_html( $settings['login_loading_svg_color'] ); ?>;"></div>
+						<?php
+						// Add inline keyframes for spinner animation.
+						wp_add_inline_style( 'menu-login-style', '
+						@keyframes spin {
+						  0% {
+							transform: rotate(0deg);
+						  }
+						  100% {
+							transform: rotate(360deg);
+						  }
+						}
+												' );
+												?>
+												<div id="menu-login-loading-<?php echo esc_attr($this->get_id()); ?>" style="display:none; margin:auto;">
+						  <div class="menu-login-spinner" style="
+							   width:50px; 
+							   height:50px; 
+							   margin:auto; 
+							   border:6px solid #ccc; 
+							   border-top-color: <?php echo esc_html($settings['login_loading_svg_color'] ?: '#333333'); ?>; 
+							   border-radius: 50%; 
+							   animation: spin 1s linear infinite;
+						  ">
+						  </div>
 						</div>
 					</div>
 				</div>
